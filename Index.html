@@ -53,7 +53,6 @@
 
             </div>
           </div>
-
         </div>
 
 
@@ -77,14 +76,15 @@
           <p  id="Tempature" >Tempature</p>
 
           <p  id="Humidity" >Humidity</p>
-
-          <p  id="Windspeed" >Windspeed</p>
-
-          <p  id="UV" >UV-index</p>
          
           </header>
-          <div class="container" id="forecast">
-          <!-- Timeblocks go here -->
+
+          <div class = "row">
+
+              <div class="container row" id="forecast">
+              <!-- Timeblocks go here -->
+
+              </div>
 
           </div>
 
@@ -103,9 +103,21 @@
        
 
 
+
+
+
+
+
+                       
+                          
+
+
+
+
       
         var targetcity = ""
         var forecast = $("#forecast")
+    
 
         $("#Date").text(dayjs())
 
@@ -126,12 +138,34 @@
                   for (var i = 0; i < numberOfDays; i++) {
 
                       var forecastCard = $(`
+                    <div class="col-md-2">
                       <div class="w3-card w3-mobile forecastCard">
                           <p>${moment(data.list[index].dt_txt).format("M/D/YYYY")}</p>
                           <img src="http://openweathermap.org/img/wn/${data.list[index].weather[0].icon}@2x.png" class="iconImage">
                           <p>Temp: ${data.list[index].main.temp} ºF</p>
                           <p>Humidity: ${data.list[index].main.humidity}%</p>
-                      </div>`)
+                      </div>
+                      <div> 
+                        `)
+
+                      if(i == 0){
+
+                        $("#Cityname").text(targetcity)
+                        $("#Tempature").text("Tempature: " + data.list[index].main.temp + "ºF")
+                        $("#Humidity").text("Humidity: " + data.list[index].main.humidity)
+
+
+                      }
+
+
+
+
+
+
+
+
+
+
 
                       $(forecast).append(forecastCard)
                       index += 8
