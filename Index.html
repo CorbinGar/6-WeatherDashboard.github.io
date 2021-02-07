@@ -22,13 +22,7 @@
     <title>Weather Dashboard</title>
   </head>
 
-
-
-
   <body>
-
-
-
 
     <nav class="navbar navbar-expand-lg navbar-light bg-dark"> 
 
@@ -52,18 +46,15 @@
               <button class="btn btn-outline-secondary" type="button" id = "SearchButton">Search</button>
 
             </div>
+
           </div>
+
+          <div id="PreviousSearches" class="row">
+
+
+          </div>
+
         </div>
-
-
-
-      
-      
-
-
-   
-
-
 
         <div class = "col-md-9">
 
@@ -80,53 +71,40 @@
           </header>
 
           <div class = "row">
-
               <div class="container row" id="forecast">
-              <!-- Timeblocks go here -->
 
               </div>
-
           </div>
 
         </div>
     </div>
 
 
-
-
-
         
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
         <script src="https://unpkg.com/dayjs@1.8.21/dayjs.min.js"></script>
-        <script type="text/javascript">
-       
 
-
-
-
-
-
-
-                       
-                          
-
-
-
-
+        <script src="HowToBasic/BasicElementRender.js"></script>
+        <script src="HowToBasic/BasicLocalStorage.js"></script>
       
+        <script type="text/javascript">
+
+
+        var PreviousSearches = []
+
+        PreviousSearches = InitItem("StoredSearches",PreviousSearches)
+
         var targetcity = ""
         var forecast = $("#forecast")
-    
-
         $("#Date").text(dayjs())
 
 
-        
-        function WeatherLookup(){
-          var requestForecastUrl = "https://api.openweathermap.org/data/2.5/forecast?q="+targetcity+"&units=imperial&apikey=5f808735c22517a7d24f100dc14431f3";
 
-          
+
+        function WeatherLookup(target){
+          $(forecast).empty();
+          var requestForecastUrl = "https://api.openweathermap.org/data/2.5/forecast?q="+target+"&units=imperial&apikey=5f808735c22517a7d24f100dc14431f3";
           fetch(requestForecastUrl)
               .then(function (response) {
                   return response.json();
@@ -136,7 +114,6 @@
                   var numberOfDays = 5
                   var index = 0
                   for (var i = 0; i < numberOfDays; i++) {
-
                       var forecastCard = $(`
                     <div class="col-md-2">
                       <div class="w3-card w3-mobile forecastCard">
@@ -147,26 +124,11 @@
                       </div>
                       <div> 
                         `)
-
                       if(i == 0){
-
-                        $("#Cityname").text(targetcity)
+                        $("#Cityname").text(target)
                         $("#Tempature").text("Tempature: " + data.list[index].main.temp + "ºF")
                         $("#Humidity").text("Humidity: " + data.list[index].main.humidity)
-
-
                       }
-
-
-
-
-
-
-
-
-
-
-
                       $(forecast).append(forecastCard)
                       index += 8
                   }
@@ -177,19 +139,42 @@
 
 
             $("#SearchButton").on("click", function() {
-
-            var texttostore = document.getElementById( "textbox" );
-            
-            targetcity = texttostore.value;
-
-
-            WeatherLookup()
+              PreviousSearches = InitItem("StoredSearches",PreviousSearches)
+              var texttostore = document.getElementById( "textbox" );
+              targetcity = texttostore.value;
+                if(targetcity !== ""){
+                  PreviousSearches[PreviousSearches.length] = targetcity
+                  SaveItem("StoredSearches",PreviousSearches)
+                  PreviousSearches = LoadItem("StoredSearches")
+                  WeatherLookup(targetcity)
+                  RenderPrevSearches()
+                }
             });
 
 
+            function RenderPrevSearches(){
 
+              var rendertarget = $("#PreviousSearches")
+              PreviousSearches = LoadItem("StoredSearches")
+              console.log(PreviousSearches)
+              rendertarget.empty();
 
+              for(var i = 0; i < PreviousSearches.length ; i++) {
+                  console.log("loop")
+                  var Div = MakeElement($("<div>"),"col-md-12","Div",i,null,PreviousSearches[i])
+                  var Btn = MakeElement($("<button>"),"btn btn-primary prev-btn","Button",i, PreviousSearches[i] ,PreviousSearches[i])
+                  ToRender = [Div,Btn]
+                  ReRenderArea(rendertarget,ToRender,Btn) 
+              }
 
+              $(".prev-btn").on("click", function() {
+              var val = $(this).attr("value")
+              WeatherLookup(val)
+              RenderPrevSearches()
+              });
+            }
+
+            RenderPrevSearches()
         </script>
     </body>
 </html>
